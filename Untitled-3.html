@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Lista de Tarefas</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f0f2f5;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+
+    .container {
+      background-color: #ffffff;
+      padding: 30px;
+      margin-top: 50px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 500px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    input[type="text"] {
+      width: calc(100% - 110px);
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+
+    button {
+      padding: 10px 15px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    ul {
+      list-style-type: none;
+      padding: 0;
+      margin-top: 20px;
+    }
+
+    li {
+      background-color: #f9f9f9;
+      border: 1px solid #ddd;
+      padding: 10px 15px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    li.completed {
+      text-decoration: line-through;
+      color: #999;
+    }
+
+    li button {
+      background-color: #e74c3c;
+      margin-left: 10px;
+    }
+
+    li button:hover {
+      background-color: #c0392b;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Minhas Tarefas</h1>
+
+    <input type="text" id="novaTarefa" placeholder="Digite uma nova tarefa" onkeypress="if(event.key === 'Enter') adicionarTarefa()">
+    <button onclick="adicionarTarefa()">Adicionar</button>
+
+    <ul id="listaTarefas"></ul>
+  </div>
+
+  <script>
+    const lista = document.getElementById('listaTarefas');
+
+    // Carregar tarefas salvas do localStorage
+    const tarefasSalvas = JSON.parse(localStorage.getItem('tarefas')) || [];
+    tarefasSalvas.forEach(tarefa => adicionarNaTela(tarefa));
+
+    function salvarTarefas() {
+      const itens = [];
+      document.querySelectorAll('li').forEach(li => {
+        itens.push({
+          title: li.querySelector('span').textContent
+        });
+      });
+      localStorage.setItem('tarefas', JSON.stringify(itens));
+    }
+
+    function adicionarTarefa() {
+      const input = document.getElementById('novaTarefa');
+      const titulo = input.value.trim();
+
+      if (!titulo) {
+        alert('Digite uma tarefa antes de adicionar.');
+        return;
+      }
+
+      const tarefa = {
+        title: titulo
+      };
+
+      adicionarNaTela(tarefa);
+      salvarTarefas();
+      input.value = '';
+    }
+
+    function adicionarNaTela(tarefa) {
+      const li = document.createElement('li');
+
+      const span = document.createElement('span');
+      span.textContent = tarefa.title;
+
+      const btn = document.createElement('button');
+      btn.textContent = 'Excluir';
+      btn.onclick = () => {
+        li.remove();
+        salvarTarefas();
+      };
+
+      li.appendChild(span);
+      li.appendChild(btn);
+      lista.appendChild(li);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Consulta de Clima</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #f0f4f8;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      width: 400px;
+      text-align: center;
+    }
+
+    h1 {
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    input {
+      width: 80%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+
+    input:focus {
+      border-color: #007BFF;
+    }
+
+    button {
+      padding: 10px 20px;
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    #clima {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #f9f9f9;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Consulta de Clima</h1>
+    <input type="text" id="cidade" placeholder="Digite a cidade">
+    <br>
+    <button onclick="buscarClima()">Buscar Clima</button>
+
+    <div id="clima"></div>
+  </div>
+
+  <script>
+    async function buscarClima() {
+      const cidade = document.getElementById('cidade').value;
+      const climaDiv = document.getElementById('clima');
+      climaDiv.innerHTML = '🔎 Buscando...';
+
+      try {
+        // Buscar latitude e longitude da cidade
+        const geoResponse = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${cidade}`);
+        const geoData = await geoResponse.json();
+
+        if (!geoData.results) {
+          climaDiv.innerHTML = ' Cidade não encontrada';
+          return;
+        }
+
+        const { latitude, longitude, name } = geoData.results[0];
+
+        // Buscar clima atual
+        const climaResponse = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true`);
+        const climaData = await climaResponse.json();
+
+        const temp = climaData.current_weather.temperature;
+        const descricao = climaData.current_weather.weathercode;
+
+        climaDiv.innerHTML = `
+          <p><strong> Cidade:</strong> ${name}</p>
+          <p><strong> Temperatura:</strong> ${temp}°C</p>
+          <p><strong> Tempo código:</strong> ${descricao}</p>
+        `;
+      } catch (error) {
+        climaDiv.innerHTML = ' Erro ao buscar o clima';
+      }
+    }
+  </script>
+</body>
+</html>
